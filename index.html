@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo Par Perfeito</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Tela Inicial: Seleção de Idade -->
+        <section id="tela-inicial" class="tela ativa">
+            <h1>Jogo Par Perfeito</h1>
+            <h2>Quantos anos você tem?</h2>
+            <div class="opcoes-idade">
+                <button class="btn-idade" data-idade="2">2</button>
+                <button class="btn-idade" data-idade="3">3</button>
+                <button class="btn-idade" data-idade="4">4</button>
+                <button class="btn-idade" data-idade="5">5</button>
+                <button class="btn-idade" data-idade="6">6</button>
+            </div>
+        </section>
+
+        <!-- Tela de Seleção de Tema -->
+        <section id="tela-selecao-tema" class="tela">
+            <h2>Escolha um tema para jogar!</h2>
+            <div class="opcoes-tema">
+                <button class="btn-tema" data-tema="animais">🐾 Animais</button>
+                <!-- Adicionar mais botões de tema aqui no futuro -->
+                <!-- <button class="btn-tema" data-tema="alimentos">🍎 Alimentos</button> -->
+            </div>
+            <button id="btn-voltar-idade" class="btn-voltar">Voltar para Idade</button>
+        </section>
+
+        <!-- Tela de Jogo -->
+        <section id="tela-jogo" class="tela">
+            <div class="info-jogo">
+                <p>Tema: <span id="tema-atual"></span></p>
+                <p>Pares Encontrados: <span id="pares-encontrados">0</span>/<span id="total-pares">0</span></p>
+            </div>
+            <div id="grid-cartas" class="grid-cartas">
+                <!-- As cartas serão inseridas aqui pelo JavaScript -->
+            </div>
+            <button id="btn-voltar-tema" class="btn-voltar">Escolher Outro Tema</button>
+        </section>
+
+        <!-- Tela de Resultado / Parabéns -->
+        <section id="tela-resultado" class="tela">
+            <h2>Parabéns!</h2>
+            <p id="mensagem-resultado">Você encontrou todos os pares!</p>
+            <!-- <p>Tempo: <span id="tempo-final">--:--</span></p> -->
+            <div class="opcoes-resultado">
+                <button id="btn-jogar-novamente">Jogar Novamente</button>
+                <button id="btn-escolher-outro-tema-resultado">Escolher Outro Tema</button>
+                <button id="btn-voltar-inicio-resultado">Voltar ao Início</button>
+            </div>
+        </section>
+    </div>
+
+    <script src="js/data.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/game.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

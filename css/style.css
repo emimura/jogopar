@@ -1,0 +1,95 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    background-color: #f0f0f0;
+    color: #333;
+}
+
+.container {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 90%;
+    max-width: 600px;
+}
+
+h1 {
+    color: #4CAF50;
+}
+
+h2 {
+    margin-bottom: 20px;
+}
+
+/* Controle de visibilidade das telas */
+.tela {
+    display: none; /* Todas as telas começam escondidas */
+}
+
+.tela.ativa {
+    display: block; /* A tela ativa é mostrada */
+}
+
+button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 10px 5px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+.btn-voltar {
+    background-color: #f44336;
+}
+.btn-voltar:hover {
+    background-color: #da190b;
+}
+
+.opcoes-idade, .opcoes-tema, .opcoes-resultado {
+    margin-bottom: 20px;
+}
+
+.grid-cartas {
+    display: grid;
+    /* O grid-template-columns e gap serão definidos pelo JS com base na dificuldade */
+    justify-content: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+/* Estilos básicos para as cartas (serão melhorados depois) */
+.carta {
+    width: 80px;
+    height: 100px;
+    background-color: #ddd;
+    border: 1px solid #ccc;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 12px; /* Para texto, se usar */
+    cursor: pointer;
+    margin: 5px; /* Adicionado para espaçamento entre cartas */
+}
+
+.carta img {
+    max-width: 90%;
+    max-height: 90%;
+    object-fit: contain;
+}
