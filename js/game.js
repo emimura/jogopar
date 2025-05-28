@@ -138,14 +138,20 @@ async function fetchBandeirasParaJogo(numItens) {
 }
 
 async function fetchDinossaurosParaJogo(numItens) {
-    const CATEGORY_API_URL = 'https://dinosaurpictures.org/api/category/all';
-    const DETAIL_API_BASE_URL = 'https://dinosaurpictures.org/api/dinosaur/';
+    // Usando um CORS proxy (allorigins)
+    // Este proxy requer que a URL de destino seja codificada.
+    const PROXY_URL = 'https://api.allorigins.win/raw?url=';
+
+    const originalCategoryApiUrl = 'https://dinosaurpictures.org/api/category/all';
+    const originalDetailApiBaseUrl = 'https://dinosaurpictures.org/api/dinosaur/';
+
     console.log(`[Dino] Iniciando busca por ${numItens} dinossauros.`);
 
     try {
         // 1. Buscar a lista de todos os nomes de dinossauros
-        console.log(`[Dino] Buscando lista de nomes de dinossauros de: ${CATEGORY_API_URL}`);
-        const responseNomes = await fetch(CATEGORY_API_URL);
+        const proxiedCategoryApiUrl = `${PROXY_URL}${encodeURIComponent(originalCategoryApiUrl)}`;
+        console.log(`[Dino] Buscando lista de nomes de dinossauros de: ${proxiedCategoryApiUrl}`);
+        const responseNomes = await fetch(proxiedCategoryApiUrl);
         console.log('[Dino] Resposta da API de categorias:', responseNomes.status, responseNomes.statusText);
         if (!responseNomes.ok) {
             throw new Error(`Falha ao buscar lista de nomes de dinossauros: ${responseNomes.status}`);
@@ -168,39 +174,45 @@ async function fetchDinossaurosParaJogo(numItens) {
             throw new Error("Não foi possível selecionar nomes de dinossauros para buscar detalhes.");
         }
 
-        // 3. Buscar detalhes para cada nome de dinossauro selecionado
-        const promessasDetalhesDinos = nomesSelecionados.map(async (nomeDino) => {
-            const urlDetalhe = `${DETAIL_API_BASE_URL}${encodeURIComponent(nomeDino)}`;
-            console.log(`[Dino] Buscando detalhes para ${nomeDino} de: ${urlDetalhe}`);
+        // 3. Buscar detalhes para cada nome de dinossauro selecionado SEQUENCIALMENTE para evitar rate limiting
+        const itensDinos = []; // Array para armazenar os dinossauros válidos. Declarada ANTES do loop.
+
+        for (const nomeDino of nomesSelecionados) {
+            const originalUrlDetalhe = `${originalDetailApiBaseUrl}${encodeURIComponent(nomeDino)}`;
+            const proxiedUrlDetalhe = `${PROXY_URL}${encodeURIComponent(originalUrlDetalhe)}`;
+            console.log(`[Dino] Buscando detalhes para ${nomeDino} de: ${proxiedUrlDetalhe}`);
+
             try {
-                const responseDetalhe = await fetch(urlDetalhe);
+                const responseDetalhe = await fetch(proxiedUrlDetalhe);
                 if (!responseDetalhe.ok) {
-                    console.warn(`[Dino] Falha ao buscar detalhes para ${nomeDino}: ${responseDetalhe.status}`);
-                    return null;
+                    console.warn(`[Dino] Falha ao buscar detalhes para ${nomeDino}: ${responseDetalhe.status} ${responseDetalhe.statusText}. Pulando.`);
+                    // Adiciona uma pequena pausa mesmo em caso de erro para não sobrecarregar
+                    await new Promise(resolve => setTimeout(resolve, 500)); // Pausa de 500ms
+                    continue; // Pula para o próximo nomeDino
                 }
                 const detalheDino = await responseDetalhe.json();
-                // A documentação indica um campo "dino" com o nome e "pics" com um array de imagens.
-                // Vamos pegar a primeira imagem da lista "pics", se existir.
-                if (detalheDino && detalheDino.dino && detalheDino.pics && detalheDino.pics.length > 0 && detalheDino.pics[0].url) {
-                    const nomeFormatado = detalheDino.dino.charAt(0).toUpperCase() + detalheDino.dino.slice(1);
-                    const id = detalheDino.dino.toLowerCase().replace(/[^a-z0-9]/g, '_').slice(0, 30);
-                    return {
+
+                if (detalheDino && detalheDino.name && detalheDino.pics && detalheDino.pics.length > 0 && detalheDino.pics[0].url) {
+                    const nomeFormatado = detalheDino.name.charAt(0).toUpperCase() + detalheDino.name.slice(1);
+                    const id = detalheDino.name.toLowerCase().replace(/[^a-z0-9]/g, '_').slice(0, 30);
+                    itensDinos.push({ // Agora 'itensDinos' está corretamente no escopo e inicializada
                         id: id,
                         nome: nomeFormatado,
-                        imagem: detalheDino.pics[0].url // Usando a URL da primeira imagem em 'pics'
-                    };
+                        imagem: detalheDino.pics[0].url
+                    });
                 } else {
                     console.warn(`[Dino] Dados incompletos ou sem imagem para ${nomeDino}:`, detalheDino);
-                    return null;
                 }
             } catch (errorDetalhe) {
                 console.error(`[Dino] Erro ao buscar detalhes para ${nomeDino}:`, errorDetalhe);
-                return null;
             }
-        });
+            // Adiciona uma pausa entre as requisições para evitar o erro 429
+            // Ajuste o tempo conforme necessário. 500ms é um valor conservador.
+            if (itensDinos.length < numItens) { // Só pausa se ainda precisarmos de mais itens
+                await new Promise(resolve => setTimeout(resolve, 500)); // Pausa de 500ms
+            }
+        }
 
-        const itensDinosCompletos = await Promise.all(promessasDetalhesDinos);
-        const itensDinos = itensDinosCompletos.filter(item => item !== null); // Remove os que falharam
         console.log(`[Dino] Dinossauros formatados para o jogo (${itensDinos.length} itens). Primeiros 5:`, itensDinos.slice(0,5));
 
         if (itensDinos.length < numItens && itensDinos.length > 0) {
@@ -263,6 +275,7 @@ async function prepararCartas() { // Tornada async
                 throw new Error("Nenhum dinossauro foi carregado da API.");
             }
         } catch (error) {
+            console.error("[Game] Erro capturado em prepararCartas para o tema '" + temaSelecionado + "':", error); // Log adicionado
             alert(`Falha ao carregar os dados do tema ${DADOS_JOGO.temas[temaSelecionado].nomeDisplay}. Por favor, tente outro tema ou verifique sua conexão.`);
             if (typeof spanStatusCarregamento !== 'undefined' && spanStatusCarregamento) {
                 spanStatusCarregamento.textContent = "";
@@ -325,13 +338,26 @@ function renderizarCartas() {
 
 function virarCartaVisualmente(elementoCarta, cartaInfo, mostrarFrente) {
     const frente = elementoCarta.querySelector('.frente-carta');
+    const temasComNomeEImagem = ['pokemon', 'bandeiras', 'dinossauros'];
 
     if (mostrarFrente) {
         // Preenche o conteúdo da frente apenas se estiver vazio ou se for forçado (não implementado aqui)
         // Isso evita recarregar a imagem desnecessariamente se a carta for clicada e desvirada rapidamente.
         if (frente.innerHTML === '') {
-            if (cartaInfo.conteudo.imagem) {
-                frente.innerHTML = `<img src="${cartaInfo.conteudo.imagem}" alt="${cartaInfo.conteudo.nome}" style="max-width: 90%; max-height: 90%; object-fit: contain;">`;
+            const conteudoNome = cartaInfo.conteudo.nome || '';
+            const conteudoImagem = cartaInfo.conteudo.imagem || '';
+
+            if (conteudoImagem) {
+                let htmlFrente = `<img src="${conteudoImagem}" alt="${conteudoNome}" class="imagem-carta">`;
+                // Adiciona o nome se for um dos temas especiais
+                if (temasComNomeEImagem.includes(temaSelecionado)) {
+                    htmlFrente += `<span class="nome-item-carta">${conteudoNome}</span>`;
+                }
+                frente.innerHTML = htmlFrente;
+            } else if (conteudoNome) {
+                // Se não tiver imagem, mas tiver nome (para temas que não são de API, por exemplo)
+                // ou como fallback se a imagem da API falhar mas o nome vier.
+                frente.innerHTML = `<span class="nome-item-carta-sem-imagem">${conteudoNome}</span>`;
             } else {
                 frente.textContent = cartaInfo.conteudo.nome;
             }
@@ -343,6 +369,7 @@ function virarCartaVisualmente(elementoCarta, cartaInfo, mostrarFrente) {
         // a imagem não precise ser recarregada. O CSS cuidará de esconder/mostrar.
     }
 }
+
 
 function aoClicarNaCarta(elementoCarta, cartaInfo) {
     if (travarCliques || cartaInfo.combinada || cartaInfo.virada) {
@@ -375,16 +402,27 @@ function aoClicarNaCarta(elementoCarta, cartaInfo) {
 
             verificarFimDeJogo();
         } else {
+            // Não é um par
             setTimeout(() => {
-                virarCartaVisualmente(primeiraCartaVirada.elemento, primeiraCartaVirada.info, false);
-                virarCartaVisualmente(segundaCartaVirada.elemento, segundaCartaVirada.info, false);
+                console.log("[DEBUG] Desvirando cartas não combinadas.");
+                // Verifica se primeiraCartaVirada e segundaCartaVirada ainda são válidos antes de acessá-los
+                if (primeiraCartaVirada && primeiraCartaVirada.info && segundaCartaVirada && segundaCartaVirada.info) {
+                    console.log("[DEBUG] Estado ANTES de desvirar - primeiraCarta.info.virada:", primeiraCartaVirada.info.virada, "segundaCarta.info.virada:", segundaCartaVirada.info.virada);
 
-                primeiraCartaVirada.info.virada = false;
-                segundaCartaVirada.info.virada = false;
+                    virarCartaVisualmente(primeiraCartaVirada.elemento, primeiraCartaVirada.info, false);
+                    virarCartaVisualmente(segundaCartaVirada.elemento, segundaCartaVirada.info, false);
 
+                    primeiraCartaVirada.info.virada = false;
+                    segundaCartaVirada.info.virada = false;
+
+                    console.log("[DEBUG] Estado DEPOIS de desvirar - primeiraCarta.info.virada:", primeiraCartaVirada.info.virada, "segundaCarta.info.virada:", segundaCartaVirada.info.virada);
+                } else {
+                    console.warn("[DEBUG] Tentativa de desvirar cartas, mas primeiraCartaVirada ou segundaCartaVirada é null/undefined.");
+                }
                 primeiraCartaVirada = null;
                 segundaCartaVirada = null;
                 travarCliques = false;
+                console.log("[DEBUG] Estado do jogo resetado, travarCliques:", travarCliques);
             }, 1000);
         }
     }

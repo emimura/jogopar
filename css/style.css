@@ -76,10 +76,10 @@ button:hover {
 
 /* Estilos básicos para as cartas (serão melhorados depois) */
 .carta {
-    width: 80px;
-    height: 100px;
-    background-color: #ddd;
-    border: 1px solid #ccc;
+    width: 120px;  /* Aumentado para horizontal */
+    height: 90px; /* Diminuído para horizontal */
+    /* background-color: #ddd; // Removido, pois o verso/frente cobrirão */
+    /* border: 1px solid #ccc; // Removido, pois o verso/frente terão borda */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -88,13 +88,6 @@ button:hover {
     margin: 5px; /* Adicionado para espaçamento entre cartas */
 }
 
-.carta img {
-    max-width: 90%;
-    max-height: 90%;
-    object-fit: contain;
-}
-
-/* Exemplo de CSS para style.css */
 .carta {
     /* ... seus estilos existentes ... */
     position: relative; /* Necessário para posicionar frente/verso */
@@ -104,6 +97,7 @@ button:hover {
     /* transition: transform 0.6s; */
 }
 
+/* Estilos comuns para frente e verso da carta */
 .carta .verso-carta,
 .carta .frente-carta {
     position: absolute;
@@ -113,43 +107,40 @@ button:hover {
     height: 100%;
     display: flex;
     justify-content: center;
-    align-items: center;
     border: 1px solid #ccc;
     box-sizing: border-box;
     /* Para efeito de virada 3D (opcional) */
     /* backface-visibility: hidden; */
 }
 
+/* Estilo específico do verso da carta */
 .carta .verso-carta {
     background-color: #666; /* Cor do verso da carta */
     color: white;
-    /* display: flex; */ /* Se não usar efeito 3D */
+    align-items: center; /* Centraliza o '?' verticalmente */
 }
 
+/* Estilo específico da frente da carta */
 .carta .frente-carta {
     background-color: #f0f0f0; /* Cor da frente da carta */
-    /* display: none; */ /* Escondido por padrão se não usar efeito 3D */
+    flex-direction: column; /* Organiza imagem e nome verticalmente */
+    align-items: center;    /* Centraliza horizontalmente */
+    text-align: center;     /* Centraliza o texto do nome */
+    padding: 5px; /* Reduzido um pouco, pois a carta é menor na altura */
     /* Para efeito de virada 3D (opcional) */
     /* transform: rotateY(180deg); */
 }
 
-.carta .frente-carta img {
-    max-width: 90%;
-    max-height: 90%;
-    object-fit: contain;
-}
-
-/* Lógica simples de mostrar/esconder sem animação 3D */
+/* Lógica de visibilidade da frente e verso */
 .carta .frente-carta {
-    display: none;
+    display: none; /* Frente escondida por padrão */
 }
 .carta.virada .verso-carta {
-    display: none;
+    display: none; /* Verso escondido quando a carta está virada */
 }
 .carta.virada .frente-carta {
-    display: flex; /* ou block, dependendo do conteúdo */
+    display: flex; /* Frente visível quando a carta está virada */
 }
-
 
 /* Estilo para cartas combinadas (opcional) */
 .carta.combinada {
@@ -169,11 +160,34 @@ button:hover {
 }
 */
 
-.status-carregamento {
+.status-carregamento { /* Mantido como estava */
     color: #ff8c00; /* Laranja escuro, por exemplo. Escolha a cor que preferir. */
     font-style: italic;
     font-weight: bold;
     margin-top: 10px; /* Adiciona um pouco de espaço acima */
     text-align: center; /* Centraliza o texto, se desejar */
     display: none; /* Começa escondido. O JavaScript vai mudar para 'block' ou 'inline' quando necessário. */
+}
+/* Adicione ou ajuste estas regras no seu style.css */
+
+.carta .frente-carta .imagem-carta {
+    max-width: 90%;  /* Imagem pode ocupar quase toda a largura */
+    max-height: 65%; /* Deixa espaço para o nome abaixo (ajuste conforme necessário) */
+    object-fit: contain;
+    display: block; /* Para garantir que margin auto funcione se necessário */
+    margin-bottom: 4px; /* Espaço entre a imagem e o nome */
+}
+
+.carta .frente-carta .nome-item-carta {
+    font-size: 0.75em; /* Reduzido um pouco para caber melhor */
+    color: #333;       /* Cor do texto do nome */
+    display: block;    /* Garante que o nome ocupe sua própria linha */
+    line-height: 1.2;  /* Espaçamento entre linhas, se o nome for muito longo e quebrar */
+    /* Você pode adicionar mais estilos aqui, como font-weight, etc. */
+}
+
+.carta .frente-carta .nome-item-carta-sem-imagem {
+    font-size: 0.9em; /* Ajustado para consistência */
+    color: #333;
+    /* Adicione outros estilos se necessário */
 }
