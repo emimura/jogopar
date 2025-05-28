@@ -191,3 +191,25 @@ button:hover {
     color: #333;
     /* Adicione outros estilos se necessário */
 }
+
+.imagem-decorativa-menu {
+    display: block;
+    margin: 15px auto;
+    width: 80px; /* Ajuste conforme o tamanho da sua imagem */
+    height: 80px;
+}
+
+.imagem-decorativa-final {
+    display: block;
+    margin: 15px auto;
+    width: 100px; /* Ajuste conforme o tamanho da sua imagem */
+    height: 100px;
+}
+
+.btn-voltar-discreto {
+    display: block; /* Para ocupar a largura e permitir margem auto */
+    margin: 20px auto 0 auto; /* Espaço acima, centralizado, sem espaço abaixo */
+    padding: 8px 15px; /* Um pouco menor que os botões principais */
+    font-size: 14px;   /* Fonte um pouco menor */
+    /* A cor vermelha já vem da classe .btn-voltar */
+}

@@ -3,61 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jogo Par Perfeito</title>
+    <title>Mestre da Memória Pokémon</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <div class="container">
         <!-- Tela Inicial: Seleção de Idade -->
         <section id="tela-inicial" class="tela ativa">
-            <h1>Jogo da Memória</h1>
-            <h2>Quantos anos você tem?</h2>
-            <div class="opcoes-idade">
-                <button class="btn-idade" data-idade="2">2</button>
-                <h2>ou</h2>
-                <button class="btn-idade" data-idade="6">6</button>
-            </div>
+            <h1>Mestre da Memória Pokémon</h1>
+            <h2>Temos que lembrar! Pokémon!</h2>
+            <img src="assets/images/pokeball.png" alt="Pokebola" class="imagem-decorativa-menu">
+            <button id="btn-iniciar-pokemon">Vamos Jogar!</button>
         </section>
 
         <!-- Tela de Seleção de Tema -->
-        <section id="tela-selecao-tema" class="tela">
-            <h2>Escolha um tema para jogar!</h2>
-            <div class="opcoes-tema">
-                <button class="btn-tema" data-tema="animais">🐾 Animais</button>
-                <button class="btn-tema" data-tema="pokemon">⚡ Pokémon</button>
-                <button class="btn-tema" data-tema="bandeiras">🚩 Bandeiras</button>
-                <button class="btn-tema" data-tema="dinossauros">🦖 Dinossauros</button>
-                <!-- Adicionar mais botões de tema aqui no futuro, ex: <button class="btn-tema" data-tema="alimentos">🍎 Alimentos</button> -->
-            </div>
-            <button id="btn-voltar-idade" class="btn-voltar">Voltar para Idade</button>
-        </section>
+        <!-- Esta seção será removida ou não utilizada -->
+        <section id="tela-selecao-tema" class="tela"></section>
 
          <!-- Tela de Jogo -->
         <section id="tela-jogo" class="tela">
             <div class="info-jogo">
-                <p>Tema: <span id="tema-atual"></span></p>
+                <!-- <p>Tema: <span id="tema-atual"></span></p> Removido ou fixo para Pokémon -->
+                <h2>Mestre da Memória Pokémon</h2>
+                <p>Nível: <span id="nivel-atual">1</span></p>
                 <p>Pares Encontrados: <span id="pares-encontrados">0</span>/<span id="total-pares">0</span></p>
                 <p id="status-carregamento" class="status-carregamento"></p> <!-- ESTE É O ELEMENTO -->
             </div>
             <div id="grid-cartas" class="grid-cartas">
                 <!-- As cartas serão inseridas aqui pelo JavaScript -->
             </div>
-            <button id="btn-voltar-tema" class="btn-voltar">Escolher Outro Tema</button>
+            <button id="btn-voltar-menu-jogo" class="btn-voltar">Voltar ao Menu</button>
         </section>
 
         <!-- Tela de Resultado / Parabéns -->
         <section id="tela-resultado" class="tela">
             <h2>Parabéns!</h2>
-            <p id="mensagem-resultado">Você encontrou todos os pares!</p>
-            <!-- <p>Tempo: <span id="tempo-final">--:--</span></p> -->
-            <div class="opcoes-resultado">
-                <button id="btn-jogar-novamente">Jogar Novamente</button>
-                <button id="btn-escolher-outro-tema-resultado">Escolher Outro Tema</button>
-                <button id="btn-voltar-inicio-resultado">Voltar ao Início</button>
+            <p id="mensagem-resultado">Nível Concluído!</p>
+            <div id="container-masterball" style="display: none;">
+                <img src="assets/images/masterball.png" alt="Master Ball" class="imagem-decorativa-final">
             </div>
+            <div class="opcoes-resultado">
+                <button id="btn-proximo-nivel">Próximo Nível</button>
+            </div>
+            <button id="btn-voltar-inicio-resultado" class="btn-voltar btn-voltar-discreto">Voltar ao Início</button>
         </section>
     </div>
-
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
     <script src="js/data.js"></script>
     <script src="js/ui.js"></script>
     <script src="js/game.js"></script>

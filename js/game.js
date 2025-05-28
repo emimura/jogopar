@@ -1,38 +1,55 @@
-let idadeJogador;
-let temaSelecionado;
-let configAtual;
+// let idadeJogador; // Não é mais necessário
+let temaSelecionado = 'pokemon'; // Tema fixo
+let configAtual; // Será definido dinamicamente por nível
 let cartasParaJogar = [];
 let primeiraCartaVirada = null;
 let segundaCartaVirada = null;
 let travarCliques = false;
 let paresEncontradosContador = 0;
-let totalParesNoJogoAtual = 0; // Novo: para guardar o número real de pares no jogo
+let totalParesNoJogoAtual = 0;
 
-async function iniciarJogo(idade, tema) { // Tornada async
-    idadeJogador = idade;
-    temaSelecionado = tema;
-    configAtual = DADOS_JOGO.configDificuldade[idadeJogador];
+let nivelAtual = 1;
+let numParesParaJogo = 2; // Começa com 2 pares (4 cartas)
+const MAX_PARES_JOGO = 20; // Aumentado para 20 níveis/pares
+
+function calcularGrid(numCartas) {
+    let colunas, linhas;
+    // Tenta manter uma proporção agradável
+    if (numCartas <= 4) { colunas = 2; linhas = Math.ceil(numCartas / 2); }
+    else if (numCartas <= 6) { colunas = 3; linhas = 2; }
+    else if (numCartas <= 9) { colunas = 3; linhas = 3; } // 3x3 para 9 cartas (não usado com pares)
+    else if (numCartas <= 10) { colunas = 5; linhas = 2; } // 5x2 para 10 cartas
+    else if (numCartas <= 12) { colunas = 4; linhas = 3; }
+    else if (numCartas <= 16) { colunas = 4; linhas = 4; }
+    else if (numCartas <= 20) { colunas = 5; linhas = 4; }
+    else { // Fallback para mais de 20 pares (40 cartas)
+        colunas = Math.ceil(Math.sqrt(numCartas));
+        linhas = Math.ceil(numCartas / colunas);
+        // Ajuste para garantir que todas as cartas caibam
+        while (colunas * linhas < numCartas) {
+            if (colunas <= linhas) colunas++; else linhas++;
+        }
+    }
+    return { colunas, linhas };
+}
+
+async function iniciarJogo(paresNesteNivel) {
+    numParesParaJogo = paresNesteNivel;
+    configAtual = { pares: numParesParaJogo, grid: calcularGrid(numParesParaJogo * 2) };
 
     paresEncontradosContador = 0;
     cartasParaJogar = [];
     primeiraCartaVirada = null;
     segundaCartaVirada = null;
     travarCliques = false;
-    totalParesNoJogoAtual = 0; // Reset
 
-    spanTemaAtual.textContent = DADOS_JOGO.temas[temaSelecionado].nomeDisplay;
+    // spanTemaAtual.textContent = DADOS_JOGO.temas[temaSelecionado].nomeDisplay; // Tema é fixo
+    if (spanNivelAtual) spanNivelAtual.textContent = nivelAtual;
     atualizarParesEncontradosDisplay();
 
     // Opcional: Mostrar mensagem de carregamento (requer elemento no HTML e ui.js)
     if (typeof spanStatusCarregamento !== 'undefined' && spanStatusCarregamento) {
-        let mensagemCarregando = "Carregando..."; // Default
-        if (temaSelecionado === 'pokemon') {
-            mensagemCarregando = "Carregando Pokémon...";
-        } else if (temaSelecionado === 'bandeiras') {
-            mensagemCarregando = "Carregando Bandeiras...";
-        } else if (temaSelecionado === 'dinossauros') {
-            mensagemCarregando = "Carregando Dinossauros...";
-        }
+        let mensagemCarregando = "Carregando Pokémon...";
         spanStatusCarregamento.textContent = mensagemCarregando;
         spanStatusCarregamento.style.display = 'block';
     }
@@ -45,7 +62,7 @@ async function iniciarJogo(idade, tema) { // Tornada async
         spanStatusCarregamento.style.display = 'none';
     }
 
-    if (cartasParaJogar.length === 0 && (temaSelecionado === 'pokemon' || temaSelecionado === 'bandeiras' || temaSelecionado === 'dinossauros')) {
+    if (cartasParaJogar.length === 0 && temaSelecionado === 'pokemon') {
         // Se prepararCartas falhou para pokemon e não populou cartasParaJogar
         // A mensagem de erro já foi dada em prepararCartas, e o usuário foi redirecionado.
         // Apenas garantimos que não prossiga se algo muito errado ocorreu.
@@ -97,138 +114,6 @@ async function fetchPokemonParaJogo(numItens) {
     }
 }
 
-async function fetchBandeirasParaJogo(numItens) {
-    console.log(`Buscando ${numItens} bandeiras da API...`);
-    try {
-        // 1. Buscar uma lista de países. A API retorna muitos dados, pegamos apenas nome e bandeiras.
-        const responseList = await fetch('https://restcountries.com/v3.1/all?fields=name,flags');
-        if (!responseList.ok) throw new Error(`Falha ao buscar lista de países: ${responseList.status}`);
-        const dataList = await responseList.json(); // Array de objetos de países
-
-        // 2. Filtrar países que têm a imagem da bandeira em PNG (mais comum) e nome comum
-        const paisesComBandeira = dataList.filter(pais => pais.flags && pais.flags.png && pais.name && pais.name.common);
-
-        // 3. Embaralhar e selecionar o número necessário de países
-        const paisesSelecionados = embaralharArray([...paisesComBandeira]).slice(0, numItens);
-
-        // 4. Formatar os dados para o formato do jogo
-        const itensBandeiras = paisesSelecionados.map(pais => {
-            const nomeComum = pais.name.common;
-            // Criar um ID simples a partir do nome comum
-            const id = nomeComum.toLowerCase().replace(/[^a-z0-9]/g, '_').slice(0, 30); // Limita e sanitiza o ID
-            return {
-                id: id,
-                nome: nomeComum,
-                imagem: pais.flags.png // Usaremos a imagem PNG da bandeira
-            };
-        });
-
-        if (itensBandeiras.length < numItens && itensBandeiras.length > 0) {
-            console.warn(`API retornou ${itensBandeiras.length} bandeiras, mas eram esperadas ${numItens}. Usando as disponíveis.`);
-        } else if (itensBandeiras.length === 0 && numItens > 0) {
-             throw new Error("Nenhuma bandeira foi carregada da API com os critérios esperados.");
-        }
-
-        console.log(`${itensBandeiras.length} bandeiras carregadas com sucesso.`);
-        return itensBandeiras;
-    } catch (error) {
-        console.error("Erro ao buscar dados das bandeiras da API:", error);
-        throw error; // Re-throw para ser pego por prepararCartas
-    }
-}
-
-async function fetchDinossaurosParaJogo(numItens) {
-    // Usando um CORS proxy (allorigins)
-    // Este proxy requer que a URL de destino seja codificada.
-    const PROXY_URL = 'https://api.allorigins.win/raw?url=';
-
-    const originalCategoryApiUrl = 'https://dinosaurpictures.org/api/category/all';
-    const originalDetailApiBaseUrl = 'https://dinosaurpictures.org/api/dinosaur/';
-
-    console.log(`[Dino] Iniciando busca por ${numItens} dinossauros.`);
-
-    try {
-        // 1. Buscar a lista de todos os nomes de dinossauros
-        const proxiedCategoryApiUrl = `${PROXY_URL}${encodeURIComponent(originalCategoryApiUrl)}`;
-        console.log(`[Dino] Buscando lista de nomes de dinossauros de: ${proxiedCategoryApiUrl}`);
-        const responseNomes = await fetch(proxiedCategoryApiUrl);
-        console.log('[Dino] Resposta da API de categorias:', responseNomes.status, responseNomes.statusText);
-        if (!responseNomes.ok) {
-            throw new Error(`Falha ao buscar lista de nomes de dinossauros: ${responseNomes.status}`);
-        }
-        const listaNomesDinos = await responseNomes.json(); // Deve ser um array de strings
-        console.log(`[Dino] Lista de nomes (${listaNomesDinos.length} dinos). Primeiros 5:`, listaNomesDinos.slice(0, 5));
-
-        if (!Array.isArray(listaNomesDinos) || listaNomesDinos.length === 0) {
-            throw new Error("Nenhum nome de dinossauro retornado pela API de categorias.");
-        }
-
-        // 2. Embaralhar e selecionar o número necessário de nomes de dinossauros
-        const nomesSelecionados = embaralharArray([...listaNomesDinos]).slice(0, numItens);
-        console.log(`[Dino] Nomes de dinossauros selecionados para o jogo (${nomesSelecionados.length}):`, nomesSelecionados);
-
-        if (nomesSelecionados.length < numItens) {
-            console.warn(`[Dino] A API forneceu menos nomes de dinossauros (${nomesSelecionados.length}) do que o solicitado (${numItens}). Usando os disponíveis.`);
-        }
-        if (nomesSelecionados.length === 0 && numItens > 0) {
-            throw new Error("Não foi possível selecionar nomes de dinossauros para buscar detalhes.");
-        }
-
-        // 3. Buscar detalhes para cada nome de dinossauro selecionado SEQUENCIALMENTE para evitar rate limiting
-        const itensDinos = []; // Array para armazenar os dinossauros válidos. Declarada ANTES do loop.
-
-        for (const nomeDino of nomesSelecionados) {
-            const originalUrlDetalhe = `${originalDetailApiBaseUrl}${encodeURIComponent(nomeDino)}`;
-            const proxiedUrlDetalhe = `${PROXY_URL}${encodeURIComponent(originalUrlDetalhe)}`;
-            console.log(`[Dino] Buscando detalhes para ${nomeDino} de: ${proxiedUrlDetalhe}`);
-
-            try {
-                const responseDetalhe = await fetch(proxiedUrlDetalhe);
-                if (!responseDetalhe.ok) {
-                    console.warn(`[Dino] Falha ao buscar detalhes para ${nomeDino}: ${responseDetalhe.status} ${responseDetalhe.statusText}. Pulando.`);
-                    // Adiciona uma pequena pausa mesmo em caso de erro para não sobrecarregar
-                    await new Promise(resolve => setTimeout(resolve, 500)); // Pausa de 500ms
-                    continue; // Pula para o próximo nomeDino
-                }
-                const detalheDino = await responseDetalhe.json();
-
-                if (detalheDino && detalheDino.name && detalheDino.pics && detalheDino.pics.length > 0 && detalheDino.pics[0].url) {
-                    const nomeFormatado = detalheDino.name.charAt(0).toUpperCase() + detalheDino.name.slice(1);
-                    const id = detalheDino.name.toLowerCase().replace(/[^a-z0-9]/g, '_').slice(0, 30);
-                    itensDinos.push({ // Agora 'itensDinos' está corretamente no escopo e inicializada
-                        id: id,
-                        nome: nomeFormatado,
-                        imagem: detalheDino.pics[0].url
-                    });
-                } else {
-                    console.warn(`[Dino] Dados incompletos ou sem imagem para ${nomeDino}:`, detalheDino);
-                }
-            } catch (errorDetalhe) {
-                console.error(`[Dino] Erro ao buscar detalhes para ${nomeDino}:`, errorDetalhe);
-            }
-            // Adiciona uma pausa entre as requisições para evitar o erro 429
-            // Ajuste o tempo conforme necessário. 500ms é um valor conservador.
-            if (itensDinos.length < numItens) { // Só pausa se ainda precisarmos de mais itens
-                await new Promise(resolve => setTimeout(resolve, 500)); // Pausa de 500ms
-            }
-        }
-
-        console.log(`[Dino] Dinossauros formatados para o jogo (${itensDinos.length} itens). Primeiros 5:`, itensDinos.slice(0,5));
-
-        if (itensDinos.length < numItens && itensDinos.length > 0) {
-            console.warn(`API retornou ${itensDinos.length} dinossauros, mas eram esperados ${numItens}. Usando os disponíveis.`);
-        } else if (itensDinos.length === 0 && numItens > 0) {
-             console.error("[Dino] Nenhum dinossauro foi carregado da API com os critérios esperados após todo o processamento.");
-             throw new Error("Nenhum dinossauro foi carregado da API com os critérios esperados.");
-        }
-        console.log(`${itensDinos.length} dinossauros carregados com sucesso.`);
-        return itensDinos;
-    } catch (error) {
-        console.error("[Dino] Erro CRÍTICO ao buscar/processar dados dos dinossauros da API:", error);
-        throw error;
-    }
-}
-
 async function prepararCartas() { // Tornada async
     let itensDoTemaParaJogo;
     const numItensUnicosParaJogo = configAtual.pares; // 'pares' aqui significa o número de itens únicos a serem pareados
@@ -249,39 +134,6 @@ async function prepararCartas() { // Tornada async
                 spanStatusCarregamento.style.display = 'none';
             }
             mostrarTela('selecaoTema'); // Volta para a seleção de tema
-            cartasParaJogar = [];
-            return;
-        }
-    } else if (temaSelecionado === 'bandeiras') {
-        try {
-            itensDoTemaParaJogo = await fetchBandeirasParaJogo(numItensUnicosParaJogo);
-            if (itensDoTemaParaJogo.length === 0 && numItensUnicosParaJogo > 0) {
-                throw new Error("Nenhuma bandeira foi carregada da API.");
-            }
-        } catch (error) {
-            alert(`Falha ao carregar os dados do tema ${DADOS_JOGO.temas[temaSelecionado].nomeDisplay}. Por favor, tente outro tema ou verifique sua conexão.`);
-            if (typeof spanStatusCarregamento !== 'undefined' && spanStatusCarregamento) {
-                spanStatusCarregamento.textContent = "";
-                spanStatusCarregamento.style.display = 'none';
-            }
-            mostrarTela('selecaoTema');
-            cartasParaJogar = [];
-            return; // Interrompe a preparação
-        }
-    } else if (temaSelecionado === 'dinossauros') {
-        try {
-            itensDoTemaParaJogo = await fetchDinossaurosParaJogo(numItensUnicosParaJogo);
-            if (itensDoTemaParaJogo.length === 0 && numItensUnicosParaJogo > 0) {
-                throw new Error("Nenhum dinossauro foi carregado da API.");
-            }
-        } catch (error) {
-            console.error("[Game] Erro capturado em prepararCartas para o tema '" + temaSelecionado + "':", error); // Log adicionado
-            alert(`Falha ao carregar os dados do tema ${DADOS_JOGO.temas[temaSelecionado].nomeDisplay}. Por favor, tente outro tema ou verifique sua conexão.`);
-            if (typeof spanStatusCarregamento !== 'undefined' && spanStatusCarregamento) {
-                spanStatusCarregamento.textContent = "";
-                spanStatusCarregamento.style.display = 'none';
-            }
-            mostrarTela('selecaoTema');
             cartasParaJogar = [];
             return;
         }
@@ -338,7 +190,7 @@ function renderizarCartas() {
 
 function virarCartaVisualmente(elementoCarta, cartaInfo, mostrarFrente) {
     const frente = elementoCarta.querySelector('.frente-carta');
-    const temasComNomeEImagem = ['pokemon', 'bandeiras', 'dinossauros'];
+    const temasComNomeEImagem = ['pokemon']; // Apenas Pokémon mostrará nome e imagem por enquanto
 
     if (mostrarFrente) {
         // Preenche o conteúdo da frente apenas se estiver vazio ou se for forçado (não implementado aqui)
@@ -434,10 +286,40 @@ function atualizarParesEncontradosDisplay() {
 
 function verificarFimDeJogo() {
     if (totalParesNoJogoAtual > 0 && paresEncontradosContador === totalParesNoJogoAtual) {
-        setTimeout(() => {
-            mensagemResultado.textContent = `Você encontrou todos os ${totalParesNoJogoAtual} pares do tema ${DADOS_JOGO.temas[temaSelecionado].nomeDisplay}!`;
-            mostrarTela('resultado');
-        }, 1000);
+        // Nível concluído
+        const btnProximo = document.getElementById('btn-proximo-nivel');
+        const containerMasterball = document.getElementById('container-masterball');
+
+        if (numParesParaJogo < MAX_PARES_JOGO) {
+            mensagemResultado.textContent = `Nível ${nivelAtual} completo! Prepare-se para o próximo!`;
+            // O botão "Próximo Nível" em tela-resultado cuidará de avançar
+            if(btnProximo) {
+                btnProximo.style.display = 'inline-block'; // Garante que está visível
+                btnProximo.textContent = "Próximo Nível";
+                btnProximo.disabled = false;
+            }
+            if(containerMasterball) containerMasterball.style.display = 'none'; // Esconde a masterball
+        } else {
+            mensagemResultado.innerHTML = `Parabéns!<br>Você concluiu todos os ${nivelAtual} níveis!<br>Agora você é um Mestre Pokémon!`; // Nova mensagem
+            // Desabilitar o botão "Próximo Nível" ou mudar seu texto
+            if(btnProximo) {
+                btnProximo.style.display = 'none'; // Esconde o botão de próximo nível
+            }
+            if(containerMasterball) containerMasterball.style.display = 'block'; // Mostra a masterball
+
+            // Lançar confetes!
+            if (typeof confetti === 'function') {
+                confetti({
+                    particleCount: 150,
+                    spread: 180,
+                    origin: { y: 0.6 }
+                });
+                // Alguns fogos de artifício extras
+                setTimeout(() => confetti({ particleCount: 100, spread: 60, origin: { x: 0.2, y: 0.7}, angle: 60, scalar: 1.2 }), 300);
+                setTimeout(() => confetti({ particleCount: 100, spread: 60, origin: { x: 0.8, y: 0.7}, angle: 120, scalar: 1.2 }), 300);
+            }
+        }
+        mostrarTela('resultado');
     }
 }
 

@@ -5,16 +5,18 @@ const telaResultado = document.getElementById('tela-resultado');
 
 const gridCartas = document.getElementById('grid-cartas');
 const spanTemaAtual = document.getElementById('tema-atual');
+const spanNivelAtual = document.getElementById('nivel-atual'); // Novo
 const spanParesEncontrados = document.getElementById('pares-encontrados');
 const spanTotalPares = document.getElementById('total-pares');
 const mensagemResultado = document.getElementById('mensagem-resultado');
+const spanStatusCarregamento = document.getElementById('status-carregamento');
 
 function mostrarTela(nomeTela) {
     // Esconde todas as telas
     telaInicial.classList.remove('ativa');
-    telaSelecaoTema.classList.remove('ativa');
     telaJogo.classList.remove('ativa');
     telaResultado.classList.remove('ativa');
+    // telaSelecaoTema não é mais usada ativamente para mostrar, mas pode ser mantida se houver planos futuros
 
     // Mostra a tela desejada
     if (nomeTela === 'inicial') {
