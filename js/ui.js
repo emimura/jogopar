@@ -35,14 +35,16 @@ function criarCartaHTML(cartaInfo, idCarta) {
     divCarta.dataset.parId = cartaInfo.parId; // Identificador do par a que pertence (ex: 'leao' ou 'savana')
     divCarta.dataset.valor = cartaInfo.valor; // O valor que define o par (ex: 'leao_savana')
 
-    // Conteúdo da carta (verso) - inicialmente escondido ou mostrando um placeholder
-    // A lógica de virar e mostrar a imagem/nome virá depois em game.js
+    // Verso da carta
     const verso = document.createElement('div');
     verso.classList.add('verso-carta');
     verso.textContent = '?'; // Placeholder
     divCarta.appendChild(verso);
 
-    // Adicionaremos a frente da carta (imagem/nome) dinamicamente ao virar
+    // Frente da carta (conteúdo será preenchido ao virar)
+    const frente = document.createElement('div');
+    frente.classList.add('frente-carta');
+    divCarta.appendChild(frente);
 
     return divCarta;
 }

@@ -1,18 +1,30 @@
 const DADOS_JOGO = {
     temas: {
         animais: {
-            nomeDisplay: "Animais",
-            pares: [
-                { id1: "leao", item1: { nome: "Leão", imagem: "assets/images/themes/animals/leao.png" }, id2: "savana", item2: { nome: "Savana", imagem: "assets/images/themes/animals/savana.png" } },
-                { id1: "macaco", item1: { nome: "Macaco", imagem: "assets/images/themes/animals/macaco.png" }, id2: "banana", item2: { nome: "Banana", imagem: "assets/images/themes/animals/banana.png" } },
-                { id1: "cachorro", item1: { nome: "Cachorro", imagem: "assets/images/themes/animals/cachorro.png" }, id2: "osso", item2: { nome: "Osso", imagem: "assets/images/themes/animals/osso.png" } },
-                { id1: "gato", item1: { nome: "Gato", imagem: "assets/images/themes/animals/gato.png" }, id2: "novelo", item2: { nome: "Novelo de Lã", imagem: "assets/images/themes/animals/novelo.png" } },
-                { id1: "vaca", item1: { nome: "Vaca", imagem: "assets/images/themes/animals/vaca.png" }, id2: "pasto", item2: { nome: "Pasto", imagem: "assets/images/themes/animals/pasto.png" } },
-                { id1: "abelha", item1: { nome: "Abelha", imagem: "assets/images/themes/animals/abelha.png" }, id2: "colmeia", item2: { nome: "Colmeia", imagem: "assets/images/themes/animals/colmeia.png" } },
-                { id1: "passaro", item1: { nome: "Pássaro", imagem: "assets/images/themes/animals/passaro.png" }, id2: "ninho", item2: { nome: "Ninho", imagem: "assets/images/themes/animals/ninho.png" } },
-                { id1: "peixe", item1: { nome: "Peixe", imagem: "assets/images/themes/animals/peixe.png" }, id2: "aquario", item2: { nome: "Aquário", imagem: "assets/images/themes/animals/aquario.png" } },
-                { id1: "sapo", item1: { nome: "Sapo", imagem: "assets/images/themes/animals/sapo.png" }, id2: "lagoa", item2: { nome: "Lagoa", imagem: "assets/images/themes/animals/lagoa.png" } },
-                { id1: "coelho", item1: { nome: "Coelho", imagem: "assets/images/themes/animals/coelho.png" }, id2: "cenoura", item2: { nome: "Cenoura", imagem: "assets/images/themes/animals/cenoura.png" } }
+            nomeDisplay: "Jogo da Memória: Animais", // Nome atualizado para clareza
+            itens: [ // Mudamos de 'pares' para 'itens'
+                { id: "urso_polar", nome: "Urso Polar", imagem: "assets/images/themes/animals/urso_polar.png" },
+                { id: "onca_pintada", nome: "Onça Pintada", imagem: "assets/images/themes/animals/onca_pintada.png" },
+                { id: "leao", nome: "Leão", imagem: "assets/images/themes/animals/leao.png" },
+                { id: "abelha", nome: "Abelha", imagem: "assets/images/themes/animals/abelha.png" },
+                { id: "peixe", nome: "Peixe", imagem: "assets/images/themes/animals/peixe.png" },
+                { id: "sapo", nome: "Sapo", imagem: "assets/images/themes/animals/sapo.png" },
+                { id: "mosca", nome: "Mosca", imagem: "assets/images/themes/animals/mosca.png" },
+                { id: "rato", nome: "Rato", imagem: "assets/images/themes/animals/rato.png" }
+                // Adicione mais animais aqui se desejar, cada um será duplicado para formar um par no jogo.
+            ]
+        },
+        pokemon: {
+            nomeDisplay: "Jogo da Memória: Pokémon",
+            itens: [
+                { id: "pikachu", nome: "Pikachu", imagem: "assets/images/themes/pokemon/pikachu.png" },
+                { id: "charmander", nome: "Charmander", imagem: "assets/images/themes/pokemon/charmander.png" },
+                { id: "squirtle", nome: "Squirtle", imagem: "assets/images/themes/pokemon/squirtle.png" },
+                { id: "bulbasaur", nome: "Bulbasaur", imagem: "assets/images/themes/pokemon/bulbasaur.png" },
+                { id: "jigglypuff", nome: "Jigglypuff", imagem: "assets/images/themes/pokemon/jigglypuff.png" },
+                { id: "eevee", nome: "Eevee", imagem: "assets/images/themes/pokemon/eevee.png" },
+                { id: "snorlax", nome: "Snorlax", imagem: "assets/images/themes/pokemon/snorlax.png" },
+                { id: "meowth", nome: "Meowth", imagem: "assets/images/themes/pokemon/meowth.png" }
             ]
         }
         // Futuramente, adicionar mais temas aqui:

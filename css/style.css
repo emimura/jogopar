@@ -93,3 +93,78 @@ button:hover {
     max-height: 90%;
     object-fit: contain;
 }
+
+/* Exemplo de CSS para style.css */
+.carta {
+    /* ... seus estilos existentes ... */
+    position: relative; /* Necessário para posicionar frente/verso */
+    cursor: pointer;
+    /* Para efeito de virada 3D (opcional) */
+    /* transform-style: preserve-3d; */
+    /* transition: transform 0.6s; */
+}
+
+.carta .verso-carta,
+.carta .frente-carta {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    /* Para efeito de virada 3D (opcional) */
+    /* backface-visibility: hidden; */
+}
+
+.carta .verso-carta {
+    background-color: #666; /* Cor do verso da carta */
+    color: white;
+    /* display: flex; */ /* Se não usar efeito 3D */
+}
+
+.carta .frente-carta {
+    background-color: #f0f0f0; /* Cor da frente da carta */
+    /* display: none; */ /* Escondido por padrão se não usar efeito 3D */
+    /* Para efeito de virada 3D (opcional) */
+    /* transform: rotateY(180deg); */
+}
+
+.carta .frente-carta img {
+    max-width: 90%;
+    max-height: 90%;
+    object-fit: contain;
+}
+
+/* Lógica simples de mostrar/esconder sem animação 3D */
+.carta .frente-carta {
+    display: none;
+}
+.carta.virada .verso-carta {
+    display: none;
+}
+.carta.virada .frente-carta {
+    display: flex; /* ou block, dependendo do conteúdo */
+}
+
+
+/* Estilo para cartas combinadas (opcional) */
+.carta.combinada {
+    cursor: default;
+    opacity: 0.7; /* Exemplo: para indicar que já foi combinada */
+}
+
+/* Se você quiser um efeito de virada 3D:
+.carta .verso-carta {
+    transform: rotateY(0deg);
+}
+.carta .frente-carta {
+    transform: rotateY(180deg);
+}
+.carta.virada {
+    transform: rotateY(180deg);
+}
+*/
