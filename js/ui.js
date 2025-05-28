@@ -8,6 +8,7 @@ const spanTemaAtual = document.getElementById('tema-atual');
 const spanParesEncontrados = document.getElementById('pares-encontrados');
 const spanTotalPares = document.getElementById('total-pares');
 const mensagemResultado = document.getElementById('mensagem-resultado');
+const spanStatusCarregamento = document.getElementById('status-carregamento'); // Nova constante
 
 function mostrarTela(nomeTela) {
     // Esconde todas as telas

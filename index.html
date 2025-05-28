@@ -25,16 +25,19 @@
             <div class="opcoes-tema">
                 <button class="btn-tema" data-tema="animais">🐾 Animais</button>
                 <button class="btn-tema" data-tema="pokemon">⚡ Pokémon</button>
+                <button class="btn-tema" data-tema="bandeiras">🚩 Bandeiras</button>
+                <button class="btn-tema" data-tema="dinossauros">🦖 Dinossauros</button>
                 <!-- Adicionar mais botões de tema aqui no futuro, ex: <button class="btn-tema" data-tema="alimentos">🍎 Alimentos</button> -->
             </div>
             <button id="btn-voltar-idade" class="btn-voltar">Voltar para Idade</button>
         </section>
 
-        <!-- Tela de Jogo -->
+         <!-- Tela de Jogo -->
         <section id="tela-jogo" class="tela">
             <div class="info-jogo">
                 <p>Tema: <span id="tema-atual"></span></p>
                 <p>Pares Encontrados: <span id="pares-encontrados">0</span>/<span id="total-pares">0</span></p>
+                <p id="status-carregamento" class="status-carregamento"></p> <!-- ESTE É O ELEMENTO -->
             </div>
             <div id="grid-cartas" class="grid-cartas">
                 <!-- As cartas serão inseridas aqui pelo JavaScript -->

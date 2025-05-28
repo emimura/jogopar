@@ -15,17 +15,16 @@ const DADOS_JOGO = {
             ]
         },
         pokemon: {
-            nomeDisplay: "Jogo da Memória: Pokémon",
-            itens: [
-                { id: "pikachu", nome: "Pikachu", imagem: "assets/images/themes/pokemon/pikachu.png" },
-                { id: "charmander", nome: "Charmander", imagem: "assets/images/themes/pokemon/charmander.png" },
-                { id: "squirtle", nome: "Squirtle", imagem: "assets/images/themes/pokemon/squirtle.png" },
-                { id: "bulbasaur", nome: "Bulbasaur", imagem: "assets/images/themes/pokemon/bulbasaur.png" },
-                { id: "jigglypuff", nome: "Jigglypuff", imagem: "assets/images/themes/pokemon/jigglypuff.png" },
-                { id: "eevee", nome: "Eevee", imagem: "assets/images/themes/pokemon/eevee.png" },
-                { id: "snorlax", nome: "Snorlax", imagem: "assets/images/themes/pokemon/snorlax.png" },
-                { id: "meowth", nome: "Meowth", imagem: "assets/images/themes/pokemon/meowth.png" }
-            ]
+            nomeDisplay: "Jogo da Memória: Pokémon (Online)", // Atualizado para indicar que usa API
+            itens: [] // Esta lista será preenchida dinamicamente pela API
+        },
+        bandeiras: {
+            nomeDisplay: "Jogo da Memória: Bandeiras (Online)",
+            itens: [] // Esta lista será preenchida dinamicamente pela API
+        },
+        dinossauros: {
+            nomeDisplay: "Jogo da Memória: Dinossauros (Online)",
+            itens: [] // Esta lista será preenchida dinamicamente pela API
         }
         // Futuramente, adicionar mais temas aqui:
         // alimentos: {

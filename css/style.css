@@ -168,3 +168,12 @@ button:hover {
     transform: rotateY(180deg);
 }
 */
+
+.status-carregamento {
+    color: #ff8c00; /* Laranja escuro, por exemplo. Escolha a cor que preferir. */
+    font-style: italic;
+    font-weight: bold;
+    margin-top: 10px; /* Adiciona um pouco de espaço acima */
+    text-align: center; /* Centraliza o texto, se desejar */
+    display: none; /* Começa escondido. O JavaScript vai mudar para 'block' ou 'inline' quando necessário. */
+}
